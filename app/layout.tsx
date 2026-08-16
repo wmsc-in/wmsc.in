@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://wmsc.in"),
   title,
   description,
-  icons: { icon: "/wmsc-logo.png", shortcut: "/wmsc-logo.png", apple: "/wmsc-logo.png" },
+  icons: { icon: "/logo.png", shortcut: "/logo.png", apple: "/logo.png" },
   openGraph: {
     title,
     description,
@@ -19,5 +19,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return (
+    <html lang="en">
+      <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-FDDFYDCVXT" />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-FDDFYDCVXT');` }} />
+      </head>
+      <body>
+        {children}
+      </body>
+    </html>
+  );
 }

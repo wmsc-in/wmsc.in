@@ -59,3 +59,4 @@ wp-config.php
 .env
 .env.*
 !.env.example
+referances/

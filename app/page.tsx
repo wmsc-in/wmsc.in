@@ -1,5 +1,8 @@
 "use client";
 
+import { ArrowDown, ArrowLeft, ArrowRight } from "@phosphor-icons/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
 
 const ZOHO_FORM_URL = "https://forms.zohopublic.in/rajileshpanolisoa1/form/EventRegistration/formperma/JlTPulLc6fSQ_eCq9wDQWDoPQDlxNiOf2gwviDgy3lU";
@@ -40,11 +43,64 @@ const moments = [
   { malayalam: "കരുതൽ", title: "Care that travels", text: "Blood donation, timely alerts and hands-on support—because community matters most when someone needs it.", number: "03" },
 ];
 
+const heroSlides = [
+  {
+    image: "/hero-kathakali.webp",
+    alt: "Kathakali performer in traditional costume at a Kerala temple courtyard",
+    malayalam: "കഥകളി",
+    label: "Kathakali · Classical art",
+    title: "Stories painted in colour.",
+    description: "A little bit of Kerala. Right here in Whitefield.",
+    position: "67% center",
+  },
+  {
+    image: "/hero-theyyam.webp",
+    alt: "Theyyam performer in vivid ceremonial costume in a sacred Kerala grove",
+    malayalam: "തെയ്യം",
+    label: "Theyyam · Living ritual",
+    title: "Rhythm, ritual, remembrance.",
+    description: "Sacred colour, living memory and a rhythm that still brings us together.",
+    position: "68% center",
+  },
+  {
+    image: "/hero-vallam-kali.webp",
+    alt: "Vallam Kali snake boat team racing across Kerala backwaters",
+    malayalam: "വള്ളംകളി",
+    label: "Vallam Kali · One team",
+    title: "One boat. One beat.",
+    description: "Every oar moving as one—Kerala’s most exhilarating expression of teamwork.",
+    position: "62% center",
+  },
+  {
+    image: "/hero-valla-sadya.webp",
+    alt: "Kerala community sharing a traditional Valla Sadya on banana leaves",
+    malayalam: "വള്ളസദ്യ",
+    label: "Valla Sadya · Shared joy",
+    title: "A feast that gathers everyone.",
+    description: "Banana leaves, generous flavours and the joy of sitting down together.",
+    position: "58% center",
+  },
+  {
+    image: "/hero-coconut-hills.webp",
+    alt: "Coconut palms, calm backwaters and misty green Kerala hills",
+    malayalam: "കേരളം",
+    label: "Kerala · Always close",
+    title: "Green horizons. Familiar calm.",
+    description: "Coconut palms, quiet water and a landscape that always feels like home.",
+    position: "62% center",
+  },
+];
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const zohoContainerRef = useRef<HTMLDivElement>(null);
+  const heroCarouselRef = useRef<HTMLDivElement>(null);
+  const heroSlideRefs = useRef<Array<HTMLElement | null>>([]);
+  const heroScrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const activeHeroSlideRef = useRef(0);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -62,11 +118,130 @@ export default function Home() {
   }, [joinOpen]);
 
   useEffect(() => {
+    const carousel = heroCarouselRef.current;
+    if (!carousel) return;
+
+    const slides = heroSlideRefs.current.filter((slide): slide is HTMLElement => Boolean(slide));
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!slides.length || reducedMotion) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const context = gsap.context(() => {
+      const media = slides.map((slide) => slide.querySelector<HTMLElement>(".hero-slide-media"));
+      const captions = slides.map((slide) => slide.querySelector<HTMLElement>(".hero-slide-content"));
+
+      gsap.set(slides, {
+        autoAlpha: 0,
+        xPercent: 0,
+        z: -220,
+        scale: 0.88,
+        rotationY: 13,
+        transformOrigin: "center center",
+        transformPerspective: 1600,
+      });
+      gsap.set(media, { scale: 1.12, rotationX: 0, rotationY: 0, transformPerspective: 1400 });
+      gsap.set(captions, { autoAlpha: 0, y: 64, rotationX: -10, z: 80, transformPerspective: 1200 });
+      gsap.set(slides[0], { autoAlpha: 1, xPercent: 0, z: 0, scale: 1, rotationY: 0 });
+      gsap.set(captions[0], { autoAlpha: 1, y: 0, rotationX: 0, z: 80 });
+
+      const timeline = gsap.timeline({ defaults: { ease: "power3.inOut" } });
+
+      for (let index = 1; index < slides.length; index += 1) {
+        const outgoing = slides[index - 1];
+        const incoming = slides[index];
+        const incomingMedia = media[index];
+        const incomingCaption = captions[index];
+        const position = index - 1;
+
+        timeline
+          .to(outgoing, {
+            autoAlpha: 0,
+            xPercent: -24,
+            z: -260,
+            scale: 0.84,
+            rotationY: -14,
+            duration: 1,
+          }, position)
+          .fromTo(incoming, {
+            autoAlpha: 0,
+            xPercent: 28,
+            z: -280,
+            scale: 0.84,
+            rotationY: 15,
+          }, {
+            autoAlpha: 1,
+            xPercent: 0,
+            z: 0,
+            scale: 1,
+            rotationY: 0,
+            duration: 1,
+          }, position)
+          .fromTo(incomingMedia, {
+            scale: 1.2,
+          }, {
+            scale: 1.06,
+            duration: 1.1,
+            ease: "power2.out",
+          }, position)
+          .fromTo(incomingCaption, {
+            autoAlpha: 0,
+            y: 72,
+            rotationX: -12,
+            z: 45,
+          }, {
+            autoAlpha: 1,
+            y: 0,
+            rotationX: 0,
+            z: 80,
+            duration: 0.68,
+            ease: "power3.out",
+          }, position + 0.24);
+      }
+
+      heroScrollTriggerRef.current = ScrollTrigger.create({
+        animation: timeline,
+        trigger: carousel,
+        start: "top top",
+        end: () => `+=${window.innerHeight * (slides.length - 1)}`,
+        pin: true,
+        scrub: 0.65,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        snap: {
+          snapTo: 1 / (slides.length - 1),
+          directional: false,
+          inertia: false,
+          duration: { min: 0.28, max: 0.72 },
+          delay: 0.85,
+          ease: "power2.inOut",
+        },
+        onUpdate: (self) => {
+          const nextIndex = Math.min(slides.length - 1, Math.round(self.progress * (slides.length - 1)));
+          if (activeHeroSlideRef.current !== nextIndex) {
+            activeHeroSlideRef.current = nextIndex;
+            setActiveHeroSlide(nextIndex);
+          }
+        },
+      });
+    }, carousel);
+
+    ScrollTrigger.refresh();
+    return () => {
+      heroScrollTriggerRef.current?.kill();
+      heroScrollTriggerRef.current = null;
+      context.revert();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!joinOpen || formSubmitted || !zohoContainerRef.current) return;
 
     const container = zohoContainerRef.current;
     const trackingWindow = window as ZohoTrackingWindow;
     let iframeSrc = `${ZOHO_FORM_URL}?zf_rszfm=1`;
+    let iframeHasLoaded = false;
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
     const appendParameter = (name: string, value: string | undefined) => {
       if (value) iframeSrc += `${iframeSrc.includes("?") ? "&" : "?"}${name}=${value}`;
@@ -122,6 +297,19 @@ export default function Home() {
     iframe.style.height = `${ZOHO_INITIAL_HEIGHT_PX}px`;
     iframe.style.width = "100%";
     iframe.style.transition = "height 0.5s ease";
+
+    const detectSuccessfulNavigation = () => {
+      // Ignore the form's initial document load. A successful submission is
+      // the only subsequent same-iframe navigation in this one-page form:
+      // Zoho opens the configured thank-you page in the iframe.
+      if (!iframeHasLoaded) {
+        iframeHasLoaded = true;
+        return;
+      }
+      setFormSubmitted(true);
+    };
+
+    iframe.addEventListener("load", detectSuccessfulNavigation);
     container.style.height = `${Math.max(ZOHO_INITIAL_HEIGHT_PX - ZOHO_FOOTER_CROP_PX, ZOHO_MIN_VISIBLE_HEIGHT_PX)}px`;
     container.replaceChildren(iframe);
 
@@ -140,23 +328,23 @@ export default function Home() {
       const parsedHeight = Number.parseInt(rawHeight, 10);
       if (!permalink || !Number.isFinite(parsedHeight) || !iframe.src.includes("formperma") || !iframe.src.includes(permalink)) return;
 
-      // Zoho adds a third message field after a successful submission.
-      // Swap the cross-origin form for our own confirmation before Zoho's
-      // default confirmation/marketing screen is shown.
-      if (frameData.length === 3) {
-        setFormSubmitted(true);
-        return;
-      }
-
       const fullHeight = parsedHeight + 15;
       const nextHeight = `${fullHeight}px`;
       if (iframe.style.height === nextHeight) return;
-      applyZohoHeight(fullHeight);
+
+      if (frameData.length === 3) {
+        iframe.scrollIntoView();
+        resizeTimer = setTimeout(() => { applyZohoHeight(fullHeight); }, 500);
+      } else {
+        applyZohoHeight(fullHeight);
+      }
     };
 
     window.addEventListener("message", resizeZohoForm, false);
     return () => {
       window.removeEventListener("message", resizeZohoForm, false);
+      iframe.removeEventListener("load", detectSuccessfulNavigation);
+      if (resizeTimer) clearTimeout(resizeTimer);
       container.replaceChildren();
     };
   }, [joinOpen, formSubmitted]);
@@ -165,6 +353,48 @@ export default function Home() {
     setFormSubmitted(false);
     setJoinOpen(true);
     setMenuOpen(false);
+  };
+
+  const goToHeroSlide = (requestedIndex: number) => {
+    const index = Math.max(0, Math.min(heroSlides.length - 1, requestedIndex));
+    const scrollTrigger = heroScrollTriggerRef.current;
+    activeHeroSlideRef.current = index;
+    setActiveHeroSlide(index);
+
+    if (scrollTrigger) {
+      const destination = scrollTrigger.start + window.innerHeight * index;
+      scrollTrigger.scroll(destination);
+      ScrollTrigger.update();
+      return;
+    }
+
+  };
+
+  const tiltActiveHeroSlide = (clientX: number, clientY: number) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const carousel = heroCarouselRef.current;
+    const slide = heroSlideRefs.current[activeHeroSlideRef.current];
+    const media = slide?.querySelector<HTMLElement>(".hero-slide-media");
+    if (!carousel || !media) return;
+
+    const bounds = carousel.getBoundingClientRect();
+    const horizontal = (clientX - bounds.left) / bounds.width - 0.5;
+    const vertical = (clientY - bounds.top) / bounds.height - 0.5;
+    gsap.to(media, {
+      x: horizontal * 14,
+      y: vertical * 10,
+      rotationY: horizontal * 5,
+      rotationX: vertical * -4,
+      duration: 0.75,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const resetActiveHeroTilt = () => {
+    const slide = heroSlideRefs.current[activeHeroSlideRef.current];
+    const media = slide?.querySelector<HTMLElement>(".hero-slide-media");
+    if (media) gsap.to(media, { x: 0, y: 0, rotationX: 0, rotationY: 0, duration: 0.85, ease: "power3.out" });
   };
 
   return (
@@ -177,7 +407,7 @@ export default function Home() {
 
       <nav className="site-nav" aria-label="Primary navigation">
         <a className="brand" href="#top" aria-label="WMSC home">
-          <img src="/wmsc-logo.png" alt="" />
+          <img src="/logo.png" alt="" />
           <span><strong>WMSC</strong><small>Whitefield Malayali Social Club</small></span>
         </a>
 
@@ -185,6 +415,7 @@ export default function Home() {
           <a href="#about" onClick={() => setMenuOpen(false)}>Our story</a>
           <a href="#community" onClick={() => setMenuOpen(false)}>Community</a>
           <a href="#moments" onClick={() => setMenuOpen(false)}>What we do</a>
+          <a href="/onam/" onClick={() => setMenuOpen(false)}>Onam 1.0</a>
           <a href="#faq" onClick={() => setMenuOpen(false)}>Questions</a>
           <button className="nav-cta" onClick={openJoin}>Join WMSC <span aria-hidden="true">↗</span></button>
         </div>
@@ -197,34 +428,73 @@ export default function Home() {
         ><span /><span /></button>
       </nav>
 
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow animate-in"><span /> Namaskaram, Whitefield!</p>
-          <h1 className="animate-in delay-one">A little bit of <em>Kerala.</em><br />Right here in Whitefield.</h1>
-          <p className="hero-lede animate-in delay-two">
-            A warm, welcoming community for Malayalis to meet, celebrate,
-            play, help and feel at home in Bengaluru.
-          </p>
-          <div className="hero-actions animate-in delay-three">
-            <button className="button button-primary" onClick={openJoin}>Join our community <span aria-hidden="true">↗</span></button>
-            <a className="text-link" href="#community">Explore WMSC <span aria-hidden="true">↓</span></a>
+      <section className="hero" id="motion" aria-label="Kerala culture in motion">
+        <div
+          className="hero-art hero-carousel"
+          ref={heroCarouselRef}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Kerala culture highlights"
+          onPointerMove={(event) => tiltActiveHeroSlide(event.clientX, event.clientY)}
+          onPointerLeave={resetActiveHeroTilt}
+        >
+          <div className="hero-slides" aria-live="off">
+            {heroSlides.map((slide, index) => (
+              <figure
+                className={`hero-slide ${index === activeHeroSlide ? "is-active" : ""}`}
+                key={slide.image}
+                ref={(element) => { heroSlideRefs.current[index] = element; }}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${index + 1} of ${heroSlides.length}: ${slide.label}`}
+                aria-hidden={index !== activeHeroSlide}
+              >
+                <div className="hero-slide-media">
+                  <img src={slide.image} alt={index === activeHeroSlide ? slide.alt : ""} style={{ objectPosition: slide.position }} />
+                </div>
+                <figcaption className="hero-slide-content">
+                  <span>{slide.label}</span>
+                  <p>{slide.malayalam}</p>
+                  {index === 0 ? <h1>{slide.title}</h1> : <h2>{slide.title}</h2>}
+                  <small>{slide.description}</small>
+                </figcaption>
+              </figure>
+            ))}
           </div>
-          <div className="hero-proof animate-in delay-three">
-            <div className="avatar-stack" aria-hidden="true"><span>മ</span><span>വ</span><span>ക</span></div>
-            <p><strong>10+ vibrant groups</strong><br />One connected community</p>
+          <div className="hero-topline">
+            <p className="hero-carousel-badge"><span /> Kerala, in motion</p>
+            <p className="hero-slide-counter" aria-live="polite">
+              <strong>{String(activeHeroSlide + 1).padStart(2, "0")}</strong>
+              <span>/</span>
+              {String(heroSlides.length).padStart(2, "0")}
+            </p>
           </div>
-        </div>
-
-        <div className="hero-art animate-in delay-two">
-          <img src="/wmsc-community-hero.png" alt="Malayali families and friends enjoying a community gathering in Whitefield" />
-          <div className="hero-wash" />
-          <div className="sun-disc"><span>W</span></div>
-          <div className="event-card">
-            <p>Rooted in Kerala · Growing in Bengaluru</p>
-            <strong>നമ്മുടെ സ്വന്തം കൂട്ടായ്മ</strong>
-            <h2>Familiar culture.<br />New connections.</h2>
+          <div className="hero-carousel-controls">
+            <button
+              className="hero-arrow"
+              onClick={() => goToHeroSlide(activeHeroSlide - 1)}
+              disabled={activeHeroSlide === 0}
+              aria-label="Show previous carousel image"
+            ><ArrowLeft size={20} weight="bold" /></button>
+            <div className="hero-dots" aria-label="Choose a carousel image">
+              {heroSlides.map((slide, index) => (
+                <button
+                  className={index === activeHeroSlide ? "is-active" : ""}
+                  key={slide.image}
+                  onClick={() => goToHeroSlide(index)}
+                  aria-label={`Show ${slide.label}`}
+                  aria-current={index === activeHeroSlide ? "true" : undefined}
+                ><span /></button>
+              ))}
+            </div>
+            <button
+              className="hero-arrow"
+              onClick={() => goToHeroSlide(activeHeroSlide + 1)}
+              disabled={activeHeroSlide === heroSlides.length - 1}
+              aria-label="Show next carousel image"
+            ><ArrowRight size={20} weight="bold" /></button>
           </div>
-          <div className="hero-caption"><span>01</span><p>Celebrating roots.<br />Creating new memories.</p></div>
+          <p className="hero-scroll-hint">Scroll to travel <ArrowDown size={16} weight="bold" /></p>
         </div>
       </section>
 
@@ -339,15 +609,23 @@ export default function Home() {
 
       <footer>
         <div className="footer-main">
-          <div className="footer-brand"><img src="/wmsc-logo.png" alt="WMSC emblem" /><div><strong>WMSC</strong><p>Whitefield Malayali<br />Social Club</p></div></div>
+          <div className="footer-brand"><img src="/logo.png" alt="WMSC emblem" /><div><strong>WMSC</strong><p>Whitefield Malayali<br />Social Club</p></div></div>
           <p>Kerala in our hearts.<br />Whitefield at our doorstep.</p>
-          <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><button onClick={openJoin}>Join us</button></div>
+          <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><a href="/onam/">Onam 1.0</a><button onClick={openJoin}>Join us</button></div>
+          <div className="footer-social">
+            <p>Follow the community</p>
+            <div>
+              <button type="button" aria-label="Facebook link coming soon"><span aria-hidden="true">f</span>Facebook</button>
+              <button type="button" aria-label="YouTube link coming soon"><span className="youtube-mark" aria-hidden="true">▶</span>YouTube</button>
+              <a href="https://www.instagram.com/whitefieldmalayalisocialclub" target="_blank" rel="noreferrer" aria-label="WMSC on Instagram"><span aria-hidden="true">◎</span>Instagram</a>
+            </div>
+          </div>
         </div>
         <div className="footer-bottom"><span>Whitefield · Bengaluru · Karnataka</span><span className="footer-credit">Built for community by <a href="https://www.soance.com/" target="_blank" rel="noreferrer">Soance Innovations</a> with love.</span><a href="#top">Back to top ↑</a></div>
       </footer>
 
       {joinOpen && (
-        <div className="modal-backdrop" onMouseDown={(event) => { if (event.currentTarget === event.target) setJoinOpen(false); }}>
+        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) setJoinOpen(false); }}>
           <div className="join-modal zoho-modal" role="dialog" aria-modal="true" aria-labelledby="join-title">
             <button className="modal-close" onClick={() => setJoinOpen(false)} aria-label="Close join form">×</button>
             {formSubmitted ? (

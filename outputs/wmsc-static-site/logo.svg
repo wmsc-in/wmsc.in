@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="900" viewBox="0 0 800 900">
+  <defs>
+    <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FDBB1B"/>
+      <stop offset="58%" stop-color="#F9A51A"/>
+      <stop offset="100%" stop-color="#F36A24"/>
+    </linearGradient>
+    <linearGradient id="greenBase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#20B94B"/>
+      <stop offset="100%" stop-color="#159447"/>
+    </linearGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Transparent background -->
+
+  <!-- Umbrella -->
+  <g stroke="#111" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="400" cy="55" r="18" fill="#D71920"/>
+    <path d="M305 140 C320 92 355 67 400 66 C445 67 480 92 495 140
+             C468 121 446 123 425 142
+             C409 123 391 123 375 142
+             C354 123 332 121 305 140 Z" fill="#149B4A"/>
+    <path d="M400 66 L400 175" stroke="#EEE8D5"/>
+    <path d="M400 68 C372 90 360 112 356 143" fill="none" stroke="#EEE8D5"/>
+    <path d="M400 68 C428 90 440 112 444 143" fill="none" stroke="#EEE8D5"/>
+  </g>
+
+  <!-- Main black guardian silhouettes -->
+  <g fill="#151515">
+    <path d="M145 240 L145 390 L126 390 L126 255
+             C170 250 205 235 245 200
+             C220 260 215 325 222 392
+             C190 354 184 303 181 260 Z"/>
+    <circle cx="146" cy="212" r="17"/>
+    <circle cx="220" cy="150" r="10"/>
+    <path d="M655 240 L655 390 L674 390 L674 255
+             C630 250 595 235 555 200
+             C580 260 585 325 578 392
+             C610 354 616 303 619 260 Z"/>
+    <circle cx="654" cy="212" r="17"/>
+    <circle cx="580" cy="150" r="10"/>
+    <circle cx="126" cy="392" r="18"/>
+    <circle cx="674" cy="392" r="18"/>
+  </g>
+
+  <!-- Main sunset medallion -->
+  <circle cx="400" cy="360" r="205" fill="url(#sunset)" stroke="#111" stroke-width="8"/>
+
+  <!-- Clouds -->
+  <g fill="#F4F0E8">
+    <path d="M465 220 c20-25 42-20 54 2 c17-8 30 1 32 14 h-92 c0-7 2-11 6-16z"/>
+    <path d="M515 266 c20-24 41-18 53 2 c16-7 29 2 31 14 h-90 c0-6 2-11 6-16z"/>
+  </g>
+
+  <!-- Palm tree -->
+  <g stroke="#171717" stroke-width="8" fill="none" stroke-linecap="round">
+    <path d="M305 350 C327 312 342 272 350 229"/>
+  </g>
+  <g fill="#149B4A">
+    <path d="M350 228 C326 213 310 215 294 228 C313 226 326 231 342 244 Z"/>
+    <path d="M351 229 C368 210 388 210 404 220 C383 220 370 228 357 246 Z"/>
+    <path d="M349 228 C349 207 339 194 322 187 C334 206 335 216 342 238 Z"/>
+    <path d="M352 229 C366 209 374 193 372 175 C358 193 352 207 348 238 Z"/>
+  </g>
+
+  <!-- Boat -->
+  <path d="M260 330 C330 365 435 390 550 355
+           C528 390 493 411 440 416
+           C365 419 307 395 260 354 Z"
+        fill="#171717"/>
+  <path d="M255 340 C240 324 229 322 218 330 C231 328 240 338 242 351 C247 372 234 391 216 408"
+        fill="none" stroke="#171717" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Rowers -->
+  <g fill="#171717" stroke="#171717" stroke-width="5" stroke-linecap="round">
+    <circle cx="329" cy="317" r="9"/><path d="M329 326 l-17 28 27 12"/><path d="M337 345 l20 30"/>
+    <circle cx="375" cy="329" r="9"/><path d="M375 338 l-16 27 24 12"/><path d="M382 356 l18 29"/>
+    <circle cx="420" cy="338" r="9"/><path d="M420 347 l-14 26 22 12"/><path d="M428 364 l17 28"/>
+    <circle cx="464" cy="344" r="9"/><path d="M464 353 l-14 24 22 12"/><path d="M472 371 l16 27"/>
+    <circle cx="507" cy="345" r="9"/><path d="M507 354 l-13 23 21 11"/><path d="M515 371 l16 26"/>
+  </g>
+
+  <!-- Water lines -->
+  <g fill="none" stroke="#E93428" stroke-width="7" stroke-linecap="round">
+    <path d="M240 410 C310 390 365 431 447 412 C502 399 541 404 565 392"/>
+    <path d="M270 452 C340 434 398 474 470 454 C514 442 542 448 560 440"/>
+    <path d="M300 490 C366 473 414 509 486 493 C516 486 541 486 555 482"/>
+  </g>
+
+  <!-- Green lower crest -->
+  <path d="M110 550
+           C180 505 240 492 306 510
+           C348 522 367 548 400 548
+           C433 548 452 522 494 510
+           C560 492 620 505 690 550
+           C650 647 565 709 472 732
+           C431 742 369 742 328 732
+           C235 709 150 647 110 550 Z"
+        fill="url(#greenBase)" stroke="#111" stroke-width="7"/>
+
+  <!-- Yellow WMSC ribbon -->
+  <path d="M115 560
+           C168 520 238 522 298 548
+           C342 568 369 575 400 575
+           C431 575 458 568 502 548
+           C562 522 632 520 685 560
+           C664 610 620 632 572 626
+           C518 620 469 605 400 605
+           C331 605 282 620 228 626
+           C180 632 136 610 115 560 Z"
+        fill="#FFF116" stroke="#F5F5F5" stroke-width="8"/>
+  <text x="400" y="595" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="76" font-weight="900" fill="#1239A4" letter-spacing="8">WMSC</text>
+
+  <!-- Ribbon tails -->
+  <path d="M121 583 C95 600 83 613 62 628 L114 633 L99 676 C136 660 157 648 187 624
+           C163 620 139 608 121 583 Z"
+        fill="#FFF116" stroke="#111" stroke-width="5"/>
+  <path d="M679 583 C705 600 717 613 738 628 L686 633 L701 676 C664 660 643 648 613 624
+           C637 620 661 608 679 583 Z"
+        fill="#FFF116" stroke="#111" stroke-width="5"/>
+
+  <!-- Kathakali-style face -->
+  <path d="M370 675 C390 660 410 660 430 675" fill="none" stroke="#1434A4" stroke-width="9" stroke-linecap="round"/>
+  <g stroke="#111" stroke-width="5">
+    <circle cx="345" cy="724" r="16" fill="#EB1B2E"/>
+    <circle cx="455" cy="724" r="16" fill="#EB1B2E"/>
+    <path d="M362 728 C381 742 419 742 438 728" fill="none" stroke="#EB1B2E" stroke-width="9"/>
+    <path d="M365 737 C382 768 418 768 435 737
+             C418 746 382 746 365 737 Z" fill="#EB1B2E"/>
+  </g>
+
+  <!-- Bottom blue name ribbon -->
+  <path id="bottomRibbon" d="M85 738
+           C190 788 282 813 400 813
+           C518 813 610 788 715 738
+           L735 792
+           C621 846 520 875 400 875
+           C280 875 179 846 65 792 Z"
+        fill="#183B9C" stroke="#111" stroke-width="5"/>
+
+  <path id="textArc" d="M115 783 C210 826 300 842 400 842 C500 842 590 826 685 783" fill="none"/>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#FFFFFF" letter-spacing="1">
+    <textPath href="#textArc" startOffset="50%" text-anchor="middle">WHITEFIELD MALAYALI SOCIAL CLUB</textPath>
+  </text>
+</svg>
