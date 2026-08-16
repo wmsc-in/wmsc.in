@@ -46,3 +46,16 @@ wp-config.php
 # Note: If you wish to whitelist themes,
 # uncomment the next line
 #/wp-content/themes
+
+# WMSC website build output and local tooling
+/node_modules/
+/.next/
+/.vinext/
+/.wrangler/
+/dist/
+/.vite/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
