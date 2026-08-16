@@ -11,6 +11,7 @@ const ZOHO_INITIAL_HEIGHT_PX = 1093;
 const ZOHO_FOOTER_CROP_PX = 230;
 const ZOHO_MIN_VISIBLE_HEIGHT_PX = 520;
 const WHATSAPP_JOIN_URL = "https://chat.whatsapp.com/EICxDD6fcK04TztRnZqOJ9";
+const JOIN_FORM_URL = "https://forms.gle/ajbEX18S3ryEoFgC8?utm_source=wmsc.in";
 
 type ZohoLeadConfig = {
   utmPNameArr: string[];
@@ -349,6 +350,8 @@ export default function Home() {
     };
   }, [joinOpen, formSubmitted]);
 
+  // Preserved for modal popup
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const openJoin = () => {
     setFormSubmitted(false);
     setJoinOpen(true);
@@ -402,7 +405,7 @@ export default function Home() {
       <div className="announcement">
         <span>നമസ്കാരം</span>
         <p>Malayalis of Whitefield, this is your community.</p>
-        <button onClick={openJoin}>Come say hello <span aria-hidden="true">↗</span></button>
+        <a href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Come say hello <span aria-hidden="true">↗</span></a>
       </div>
 
       <nav className="site-nav" aria-label="Primary navigation">
@@ -417,7 +420,7 @@ export default function Home() {
           <a href="#moments" onClick={() => setMenuOpen(false)}>What we do</a>
           <a href="/onam/" onClick={() => setMenuOpen(false)}>Onam 1.0</a>
           <a href="#faq" onClick={() => setMenuOpen(false)}>Questions</a>
-          <button className="nav-cta" onClick={openJoin}>Join WMSC <span aria-hidden="true">↗</span></button>
+          <a className="nav-cta" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join WMSC <span aria-hidden="true">↗</span></a>
         </div>
 
         <button
@@ -533,12 +536,12 @@ export default function Home() {
         </div>
         <div className="group-grid">
           {groups.map((group, index) => (
-            <button className={`group-card ${group.tone} reveal`} key={group.name} onClick={openJoin}>
+            <a className={`group-card ${group.tone} reveal`} key={group.name} href={JOIN_FORM_URL} target="_blank" rel="noreferrer">
               <span className="group-index">{String(index + 1).padStart(2, "0")}</span>
               <span className="group-icon" aria-hidden="true">{group.icon}</span>
               <span className="group-content"><strong>{group.name}</strong><small>{group.note}</small></span>
               <span className="group-arrow" aria-hidden="true">↗</span>
-            </button>
+            </a>
           ))}
         </div>
       </section>
@@ -570,7 +573,7 @@ export default function Home() {
           <p className="malayalam-word">ഒരുമ</p>
           <h2>Different journeys.<br />One shared <em>home.</em></h2>
           <p>WMSC makes it easier to arrive, connect and participate. Join the general community first, then choose the circles that match your interests.</p>
-          <button className="button button-light" onClick={openJoin}>Find your circle <span aria-hidden="true">↗</span></button>
+          <a className="button button-light" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Find your circle <span aria-hidden="true">↗</span></a>
         </div>
       </section>
 
@@ -604,14 +607,14 @@ export default function Home() {
         <p className="malayalam-word">കൂടെ കൂടാം</p>
         <h2>Your Whitefield<br />community is <em>waiting.</em></h2>
         <p>Bring your stories, your ideas and your favourite sadya debate.</p>
-        <button className="button button-primary" onClick={openJoin}>Join WMSC today <span aria-hidden="true">↗</span></button>
+        <a className="button button-primary" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join WMSC today <span aria-hidden="true">↗</span></a>
       </section>
 
       <footer>
         <div className="footer-main">
           <div className="footer-brand"><img src="/logo.png" alt="WMSC emblem" /><div><strong>WMSC</strong><p>Whitefield Malayali<br />Social Club</p></div></div>
           <p>Kerala in our hearts.<br />Whitefield at our doorstep.</p>
-          <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><a href="/onam/">Onam 1.0</a><button onClick={openJoin}>Join us</button></div>
+          <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><a href="/onam/">Onam 1.0</a><a className="footer-join" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join us</a></div>
           <div className="footer-social">
             <p>Follow the community</p>
             <div>

@@ -12,18 +12,21 @@ import {
   Play,
   UsersThree,
 } from "@phosphor-icons/react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./onam.module.css";
 
-const heroBackdrops = [
-  "/onam-cinematic-hero-a.jpg",
-  "/onam-cinematic-hero-b.jpg",
-];
+const JOIN_FORM_URL = "https://forms.gle/ajbEX18S3ryEoFgC8?utm_source=wmsc.in";
 
-const celebrationBackdrops = [
-  "/onam-cinematic-celebration-a.jpg",
-  "/onam-cinematic-celebration-b.jpg",
+const backdropSlides = [
+  {
+    src: "/onam-cinematic-hero-a.jpg",
+    alt: "Joyful Maveli artwork from the WMSC Onam 1.0 poster",
+  },
+  {
+    src: "/onam-cinematic-celebration.jpg",
+    alt: "Traditional Kerala Kathakali and cultural celebration",
+  },
 ];
 
 const celebrationCards = [
@@ -52,76 +55,57 @@ const entrance = {
   visible: { filter: "blur(0px)", opacity: 1, y: 0 },
 };
 
-function FadingBackdrop({ sources, label }: { sources: string[]; label: string }) {
-  const imageRefs = useRef<Array<HTMLImageElement | null>>([]);
-  const frameRefs = useRef<Array<number | null>>(sources.map(() => null));
-  const activeIndexRef = useRef(0);
-  const cycleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+function FixedScrollSlider() {
+  const { scrollYProgress } = useScroll();
   const prefersReducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    const images = imageRefs.current.filter((image): image is HTMLImageElement => Boolean(image));
-    const frames = frameRefs.current;
-    if (!images.length) return;
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 85,
+    damping: 26,
+    restDelta: 0.001,
+  });
 
-    const fadeTo = (image: HTMLImageElement, target: number, duration: number, index: number) => {
-      const runningFrame = frameRefs.current[index];
-      if (runningFrame !== null) cancelAnimationFrame(runningFrame);
+  // Slide 1 (Maveli): visible at top, gently fades out as user scrolls past 30%
+  const heroOpacity = useTransform(smoothProgress, [0, 0.22, 0.52], [1, 0.9, 0]);
+  const heroScale = useTransform(smoothProgress, [0, 0.52], [1, 1.05]);
+  const heroY = useTransform(smoothProgress, [0, 0.52], [0, -25]);
 
-      const startOpacity = Number.parseFloat(image.style.opacity || window.getComputedStyle(image).opacity || "0");
-      const startTime = performance.now();
-
-      const step = (time: number) => {
-        const progress = Math.min((time - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        image.style.opacity = String(startOpacity + (target - startOpacity) * eased);
-        if (progress < 1) {
-          frameRefs.current[index] = requestAnimationFrame(step);
-        } else {
-          frameRefs.current[index] = null;
-        }
-      };
-
-      frameRefs.current[index] = requestAnimationFrame(step);
-    };
-
-    images.forEach((image) => { image.style.opacity = "0"; });
-    const firstImage = images[0];
-    const revealFirst = () => fadeTo(firstImage, 1, prefersReducedMotion ? 1 : 700, 0);
-    if (firstImage.complete) revealFirst();
-    else firstImage.addEventListener("load", revealFirst, { once: true });
-
-    if (!prefersReducedMotion && sources.length > 1) {
-      const cycle = () => {
-        const current = activeIndexRef.current;
-        const next = (current + 1) % images.length;
-        images[next].style.opacity = "0";
-        fadeTo(images[current], 0, 650, current);
-        fadeTo(images[next], 1, 650, next);
-        activeIndexRef.current = next;
-        cycleTimerRef.current = setTimeout(cycle, 6100);
-      };
-      cycleTimerRef.current = setTimeout(cycle, 6100);
-    }
-
-    return () => {
-      firstImage.removeEventListener("load", revealFirst);
-      if (cycleTimerRef.current) clearTimeout(cycleTimerRef.current);
-      frames.forEach((frame) => { if (frame !== null) cancelAnimationFrame(frame); });
-    };
-  }, [prefersReducedMotion, sources]);
+  // Slide 2 (Celebration): smoothly fades in and scales smoothly as user scrolls into the celebration section
+  const celebrationOpacity = useTransform(smoothProgress, [0.22, 0.55, 1], [0, 1, 1]);
+  const celebrationScale = useTransform(smoothProgress, [0.22, 1], [1.05, 1]);
+  const celebrationY = useTransform(smoothProgress, [0.22, 1], [25, 0]);
 
   return (
-    <div className={styles.backdrop} role="img" aria-label={label}>
-      {sources.map((source, index) => (
+    <div className={styles.fixedBackdrop} aria-hidden="true">
+      <motion.div
+        className={styles.fixedSlide}
+        style={{
+          opacity: prefersReducedMotion ? 1 : heroOpacity,
+          scale: prefersReducedMotion ? 1 : heroScale,
+          y: prefersReducedMotion ? 0 : heroY,
+        }}
+      >
         <img
-          key={source}
-          ref={(element) => { imageRefs.current[index] = element; }}
-          src={source}
-          alt=""
-          aria-hidden="true"
+          src={backdropSlides[0].src}
+          alt={backdropSlides[0].alt}
+          className={styles.maveliImage}
         />
-      ))}
+      </motion.div>
+
+      <motion.div
+        className={styles.fixedSlide}
+        style={{
+          opacity: prefersReducedMotion ? 1 : celebrationOpacity,
+          scale: prefersReducedMotion ? 1 : celebrationScale,
+          y: prefersReducedMotion ? 0 : celebrationY,
+        }}
+      >
+        <img
+          src={backdropSlides[1].src}
+          alt={backdropSlides[1].alt}
+          className={styles.celebrationImage}
+        />
+      </motion.div>
     </div>
   );
 }
@@ -177,6 +161,8 @@ export default function OnamPage() {
 
   return (
     <main className={styles.page} id="onam-top">
+      <FixedScrollSlider />
+
       <header className={styles.navbar}>
         <a className={`${styles.logoButton} ${styles.liquidGlass}`} href="/" aria-label="WMSC home">
           <img src="/logo.png" alt="" />
@@ -187,16 +173,14 @@ export default function OnamPage() {
           <a href="#celebration">Programme</a>
           <a href="#celebration">Traditions</a>
           <a href="https://www.instagram.com/whitefieldmalayalisocialclub" target="_blank" rel="noreferrer">Community</a>
-          <a href="/#join">Plan your Onam</a>
-          <a className={styles.navAction} href="/#join">Join WMSC <ArrowUpRight size={18} weight="bold" /></a>
+          <a href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Plan your Onam</a>
+          <a className={styles.navAction} href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join WMSC <ArrowUpRight size={18} weight="bold" /></a>
         </nav>
 
         <a className={`${styles.mobileHome} ${styles.liquidGlass}`} href="/">WMSC</a>
       </header>
 
       <section className={styles.hero} aria-labelledby="onam-title">
-        <FadingBackdrop sources={heroBackdrops} label="Joyful Maveli artwork from the WMSC Onam 1.0 poster" />
-
         <div className={styles.heroLayer}>
           <div className={`${styles.heroContent} ${styles.liquidGlassStrong}`}>
             <motion.div className={`${styles.badge} ${styles.liquidGlass}`} variants={entrance} initial="hidden" animate="visible" transition={motionTransition(0.35)}>
@@ -212,7 +196,7 @@ export default function OnamPage() {
             </motion.p>
 
             <motion.div className={styles.heroActions} variants={entrance} initial="hidden" animate="visible" transition={motionTransition(1.05)}>
-              <a className={`${styles.primaryAction} ${styles.liquidGlassStrong}`} href="/#join">
+              <a className={`${styles.primaryAction} ${styles.liquidGlassStrong}`} href={JOIN_FORM_URL} target="_blank" rel="noreferrer">
                 Join the celebration <ArrowUpRight size={20} weight="bold" />
               </a>
               <a className={styles.textAction} href="#celebration">
@@ -240,8 +224,6 @@ export default function OnamPage() {
       </section>
 
       <section className={styles.celebration} id="celebration" aria-labelledby="celebration-title">
-        <FadingBackdrop sources={celebrationBackdrops} label="Maveli tug-of-war and festive Onam programme artwork" />
-
         <div className={styles.celebrationLayer}>
           <motion.div className={styles.sectionHeader} initial={{ filter: "blur(10px)", opacity: 0, y: 28 }} whileInView={{ filter: "blur(0px)", opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={motionTransition(0.1)}>
             <div>
@@ -274,7 +256,7 @@ export default function OnamPage() {
 
           <div className={styles.sectionFooter}>
             <p><Confetti size={18} weight="regular" /> Cultural programmes · Music and dance · Fun and games · Onasadhya · Surprises</p>
-            <a className={`${styles.footerAction} ${styles.liquidGlassStrong}`} href="/#join">Be part of Onam 1.0 <ArrowUpRight size={19} weight="bold" /></a>
+            <a className={`${styles.footerAction} ${styles.liquidGlassStrong}`} href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Be part of Onam 1.0 <ArrowUpRight size={19} weight="bold" /></a>
           </div>
         </div>
       </section>

@@ -25,9 +25,10 @@ img { display: block; max-width: 100%; }
 
 .announcement { min-height: 38px; padding: 8px max(32px, calc((100vw - 1320px) / 2)); display: flex; align-items: center; justify-content: center; gap: 13px; color: var(--cream); background: var(--green-deep); font-size: 11px; letter-spacing: .04em; position: relative; z-index: 20; }
 .announcement > span { color: var(--lime); font-weight: 800; }
-.announcement p { margin: 0; opacity: .82; }
-.announcement button { border: 0; padding: 0; margin-left: 6px; color: var(--lime); background: none; font-weight: 800; font-size: 11px; }
-.announcement button span { margin-left: 5px; }
+.announcement button,
+.announcement a { border: 0; padding: 0; margin-left: 6px; color: var(--lime); background: none; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; }
+.announcement button span,
+.announcement a span { margin-left: 5px; }
 
 .site-nav { width: min(1320px, calc(100% - 64px)); height: 112px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); position: relative; z-index: 15; }
 .brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 16; }
@@ -211,7 +212,8 @@ footer { padding: 75px max(32px, calc((100vw - 1320px) / 2)) 25px; color: var(--
 .footer-main > p { margin: 7px 0 0; font: italic 400 27px/1.35 var(--serif); color: var(--lime); }
 .footer-links { display: flex; flex-direction: column; align-items: flex-start; gap: 13px; font-size: 12px; }
 .footer-links a:hover { color: var(--lime); }
-.footer-links button { padding: 0; border: 0; color: var(--lime); background: none; font-size: 12px; font-weight: 800; }
+.footer-links button,
+.footer-links a.footer-join { padding: 0; border: 0; color: var(--lime); background: none; font-size: 12px; font-weight: 800; }
 .footer-social > p { margin: 2px 0 19px; color: var(--lime); font-size: 9px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
 .footer-social > div { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 .footer-social a, .footer-social button { padding: 0; border: 0; display: inline-flex; align-items: center; gap: 10px; color: rgba(255,255,255,.72); background: transparent; font-size: 11px; transition: color .2s ease, transform .2s ease; }
