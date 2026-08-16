@@ -1,6 +1,26 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const ZOHO_FORM_URL = "https://forms.zohopublic.in/rajileshpanolisoa1/form/EventRegistration/formperma/JlTPulLc6fSQ_eCq9wDQWDoPQDlxNiOf2gwviDgy3lU";
+const ZOHO_FORM_ID = "zf_div_JlTPulLc6fSQ_eCq9wDQWDoPQDlxNiOf2gwviDgy3lU";
+const ZOHO_INITIAL_HEIGHT_PX = 1093;
+const ZOHO_FOOTER_CROP_PX = 230;
+const ZOHO_MIN_VISIBLE_HEIGHT_PX = 520;
+const WHATSAPP_JOIN_URL = "https://chat.whatsapp.com/EICxDD6fcK04TztRnZqOJ9";
+
+type ZohoLeadConfig = {
+  utmPNameArr: string[];
+  utmcustPNameArr?: string[];
+  isSameDomian?: boolean;
+};
+
+type ZohoTrackingWindow = typeof window & {
+  ZFAdvLead?: ZohoLeadConfig;
+  zfutm_zfAdvLead?: { zfautm_gC_enc: (name: string) => string | undefined };
+  ZFLead?: ZohoLeadConfig;
+  zfutm_zfLead?: { zfutm_gC_enc: (name: string) => string | undefined };
+};
 
 const groups = [
   { icon: "🏏", name: "Sports & Games", note: "Cricket, badminton and friendly competition", tone: "sun" },
@@ -23,7 +43,8 @@ const moments = [
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const zohoContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -40,15 +61,110 @@ export default function Home() {
     };
   }, [joinOpen]);
 
+  useEffect(() => {
+    if (!joinOpen || formSubmitted || !zohoContainerRef.current) return;
+
+    const container = zohoContainerRef.current;
+    const trackingWindow = window as ZohoTrackingWindow;
+    let iframeSrc = `${ZOHO_FORM_URL}?zf_rszfm=1`;
+
+    const appendParameter = (name: string, value: string | undefined) => {
+      if (value) iframeSrc += `${iframeSrc.includes("?") ? "&" : "?"}${name}=${value}`;
+    };
+
+    try {
+      const advancedLead = trackingWindow.ZFAdvLead;
+      const advancedEncoder = trackingWindow.zfutm_zfAdvLead;
+      if (advancedLead && advancedEncoder) {
+        advancedLead.utmPNameArr.forEach((parameter) => {
+          const isCustom = advancedLead.utmcustPNameArr?.includes(parameter) ?? false;
+          const outputName = advancedLead.isSameDomian && !isCustom ? `zf_${parameter}` : parameter;
+          appendParameter(outputName, advancedEncoder.zfautm_gC_enc(parameter));
+        });
+      }
+
+      const lead = trackingWindow.ZFLead;
+      const leadEncoder = trackingWindow.zfutm_zfLead;
+      if (lead && leadEncoder) {
+        lead.utmPNameArr.forEach((parameter) => {
+          appendParameter(parameter, leadEncoder.zfutm_gC_enc(parameter));
+        });
+      }
+    } catch {
+      // Zoho tracking globals are optional.
+    }
+
+    if (!/[?&]referrername=/.test(iframeSrc)) {
+      let referrer = window.location.href;
+      try {
+        referrer = window.self !== window.top
+          ? window.top?.location.href ?? referrer
+          : (/^https?:\/\/[\w.-]+\.[a-zA-Z]{2,}/i.test(referrer) ? referrer : "");
+      } catch {
+        // Cross-origin parent pages are intentionally ignored.
+      }
+
+      if (referrer.length > 1800) {
+        const queryIndex = referrer.indexOf("?");
+        if (queryIndex > -1) referrer = referrer.substring(0, queryIndex);
+        if (referrer.length > 1800) referrer = referrer.substring(0, 1800);
+      }
+      if (referrer) appendParameter("referrername", encodeURIComponent(referrer));
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.src = iframeSrc;
+    iframe.className = "zoho-form";
+    iframe.title = "WMSC Event Registration";
+    iframe.setAttribute("aria-label", "Event Registration");
+    iframe.setAttribute("frameborder", "0");
+    iframe.setAttribute("scrolling", "no");
+    iframe.style.height = `${ZOHO_INITIAL_HEIGHT_PX}px`;
+    iframe.style.width = "100%";
+    iframe.style.transition = "height 0.5s ease";
+    container.style.height = `${Math.max(ZOHO_INITIAL_HEIGHT_PX - ZOHO_FOOTER_CROP_PX, ZOHO_MIN_VISIBLE_HEIGHT_PX)}px`;
+    container.replaceChildren(iframe);
+
+    const applyZohoHeight = (fullHeight: number) => {
+      iframe.style.height = `${fullHeight}px`;
+      container.style.height = `${Math.max(fullHeight - ZOHO_FOOTER_CROP_PX, ZOHO_MIN_VISIBLE_HEIGHT_PX)}px`;
+    };
+
+    const resizeZohoForm = (event: MessageEvent) => {
+      if (typeof event.data !== "string") return;
+      if (event.source !== iframe.contentWindow) return;
+      const frameData = event.data.split("|");
+      if (frameData.length !== 2 && frameData.length !== 3) return;
+
+      const [permalink, rawHeight] = frameData;
+      const parsedHeight = Number.parseInt(rawHeight, 10);
+      if (!permalink || !Number.isFinite(parsedHeight) || !iframe.src.includes("formperma") || !iframe.src.includes(permalink)) return;
+
+      // Zoho adds a third message field after a successful submission.
+      // Swap the cross-origin form for our own confirmation before Zoho's
+      // default confirmation/marketing screen is shown.
+      if (frameData.length === 3) {
+        setFormSubmitted(true);
+        return;
+      }
+
+      const fullHeight = parsedHeight + 15;
+      const nextHeight = `${fullHeight}px`;
+      if (iframe.style.height === nextHeight) return;
+      applyZohoHeight(fullHeight);
+    };
+
+    window.addEventListener("message", resizeZohoForm, false);
+    return () => {
+      window.removeEventListener("message", resizeZohoForm, false);
+      container.replaceChildren();
+    };
+  }, [joinOpen, formSubmitted]);
+
   const openJoin = () => {
-    setSubmitted(false);
+    setFormSubmitted(false);
     setJoinOpen(true);
     setMenuOpen(false);
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitted(true);
   };
 
   return (
@@ -227,34 +343,30 @@ export default function Home() {
           <p>Kerala in our hearts.<br />Whitefield at our doorstep.</p>
           <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><button onClick={openJoin}>Join us</button></div>
         </div>
-        <div className="footer-bottom"><span>Whitefield · Bengaluru · Karnataka</span><span>Built for community, with സ്നേഹം.</span><a href="#top">Back to top ↑</a></div>
+        <div className="footer-bottom"><span>Whitefield · Bengaluru · Karnataka</span><span className="footer-credit">Built for community by <a href="https://www.soance.com/" target="_blank" rel="noreferrer">Soance Innovations</a> with love.</span><a href="#top">Back to top ↑</a></div>
       </footer>
 
       {joinOpen && (
         <div className="modal-backdrop" onMouseDown={(event) => { if (event.currentTarget === event.target) setJoinOpen(false); }}>
-          <div className="join-modal" role="dialog" aria-modal="true" aria-labelledby="join-title">
+          <div className="join-modal zoho-modal" role="dialog" aria-modal="true" aria-labelledby="join-title">
             <button className="modal-close" onClick={() => setJoinOpen(false)} aria-label="Close join form">×</button>
-            {!submitted ? (
+            {formSubmitted ? (
+              <div className="zoho-success" role="status" aria-live="polite">
+                <span className="success-icon" aria-hidden="true"><i /></span>
+                <p className="modal-kicker">Registration complete</p>
+                <h2 id="join-title">Thank you!</h2>
+                <p>Your registration is complete. Join the official WMSC WhatsApp community to stay connected.</p>
+                <a className="button success-join-button" href={WHATSAPP_JOIN_URL} target="_blank" rel="noreferrer">
+                  Click here to Join Now <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            ) : (
               <>
                 <p className="modal-kicker">Welcome home</p>
-                <h2 id="join-title">Come be part of<br /><em>WMSC.</em></h2>
-                <p className="modal-intro">Leave your details and a club volunteer can help you find the right official WMSC community.</p>
-                <form onSubmit={handleSubmit}>
-                  <label><span>Your name</span><input name="name" type="text" autoComplete="name" placeholder="How should we call you?" required /></label>
-                  <div className="field-row">
-                    <label><span>WhatsApp number</span><input name="phone" type="tel" autoComplete="tel" placeholder="+91" required /></label>
-                    <label><span>Your area</span><input name="area" type="text" placeholder="e.g. Kadugodi" required /></label>
-                  </div>
-                  <label><span>Most interested in</span><select name="interest" defaultValue=""><option value="" disabled>Choose a community</option>{groups.map((group) => <option key={group.name}>{group.name}</option>)}</select></label>
-                  <label className="consent"><input type="checkbox" required /><span>I’m happy for a WMSC volunteer to contact me about joining.</span></label>
-                  <button className="button button-primary" type="submit">Send my interest <span aria-hidden="true">↗</span></button>
-                </form>
-                <small className="privacy-note">Your details are only used to help you connect with the right WMSC group.</small>
+                <h2 id="join-title">Come be part of <em>WMSC.</em></h2>
+                <p className="modal-intro">Complete the registration form below and a club volunteer can help you find the right official WMSC community.</p>
+                <div id={ZOHO_FORM_ID} ref={zohoContainerRef} className="zoho-form-shell" />
               </>
-            ) : (
-              <div className="success-state">
-                <span aria-hidden="true">✓</span><p className="modal-kicker">Interest received</p><h2 id="join-title">നന്ദി!</h2><p>Thanks for reaching out. A WMSC volunteer can take it from here.</p><button className="button button-primary" onClick={() => setJoinOpen(false)}>Back to the website</button>
-              </div>
             )}
           </div>
         </div>
