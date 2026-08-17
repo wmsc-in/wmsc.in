@@ -46,6 +46,15 @@ const moments = [
 
 const heroSlides = [
   {
+    image: "/inaguration.png",
+    alt: "WMSC Grand Inauguration ceremony with members and dignitaries celebrating community spirit",
+    malayalam: "ഉദ്ഘാടനം",
+    label: "WMSC Inauguration · Grand Opening",
+    title: "Where our journey begins.",
+    description: "United by heritage, thriving in Whitefield—celebrating the official grand launch of WMSC.",
+    position: "center center",
+  },
+  {
     image: "/hero-kathakali.webp",
     alt: "Kathakali performer in traditional costume at a Kerala temple courtyard",
     malayalam: "കഥകളി",
@@ -151,25 +160,36 @@ export default function Home() {
       for (let index = 1; index < slides.length; index += 1) {
         const outgoing = slides[index - 1];
         const incoming = slides[index];
+        const outgoingCaption = captions[index - 1];
         const incomingMedia = media[index];
         const incomingCaption = captions[index];
         const position = index - 1;
 
+        if (outgoingCaption) {
+          timeline.to(outgoingCaption, {
+            autoAlpha: 0,
+            y: -36,
+            rotationX: 8,
+            duration: 0.55,
+            ease: "power2.in",
+          }, position);
+        }
+
         timeline
           .to(outgoing, {
             autoAlpha: 0,
-            xPercent: -24,
+            xPercent: -22,
             z: -260,
             scale: 0.84,
-            rotationY: -14,
+            rotationY: -12,
             duration: 1,
           }, position)
           .fromTo(incoming, {
             autoAlpha: 0,
-            xPercent: 28,
+            xPercent: 26,
             z: -280,
             scale: 0.84,
-            rotationY: 15,
+            rotationY: 14,
           }, {
             autoAlpha: 1,
             xPercent: 0,
@@ -179,25 +199,25 @@ export default function Home() {
             duration: 1,
           }, position)
           .fromTo(incomingMedia, {
-            scale: 1.2,
+            scale: 1.22,
           }, {
-            scale: 1.06,
-            duration: 1.1,
+            scale: 1.05,
+            duration: 1.15,
             ease: "power2.out",
           }, position)
           .fromTo(incomingCaption, {
             autoAlpha: 0,
-            y: 72,
-            rotationX: -12,
+            y: 64,
+            rotationX: -10,
             z: 45,
           }, {
             autoAlpha: 1,
             y: 0,
             rotationX: 0,
             z: 80,
-            duration: 0.68,
+            duration: 0.72,
             ease: "power3.out",
-          }, position + 0.24);
+          }, position + 0.22);
       }
 
       heroScrollTriggerRef.current = ScrollTrigger.create({
@@ -206,15 +226,15 @@ export default function Home() {
         start: "top top",
         end: () => `+=${window.innerHeight * (slides.length - 1)}`,
         pin: true,
-        scrub: 0.65,
+        scrub: 0.8,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         snap: {
           snapTo: 1 / (slides.length - 1),
           directional: false,
           inertia: false,
-          duration: { min: 0.28, max: 0.72 },
-          delay: 0.85,
+          duration: { min: 0.3, max: 0.75 },
+          delay: 0.6,
           ease: "power2.inOut",
         },
         onUpdate: (self) => {
