@@ -649,9 +649,14 @@
   }
 
   .fixedSlide img {
-    width: 140vw;
-    height: 110vh;
-    object-position: center 20%;
+    width: 100vw;
+    height: 100svh;
+  }
+
+  /* Preserve the source image's sharpness and keep the Malayalam lettering on
+     Maveli's glasses inside the narrow mobile crop. */
+  .maveliImage {
+    object-position: 31% 18% !important;
   }
 
   .sectionHeader {

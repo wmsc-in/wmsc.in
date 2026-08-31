@@ -824,11 +824,17 @@ footer { padding: 75px max(32px, calc((100vw - 1320px) / 2)) 25px; color: var(--
     margin: 18px auto 22px;
     transform: none;
   }
-  .home-page .hero-topline { top: 18px; }
+  /* Keep the section label clear of faces in the inauguration photograph. */
+  .home-page .hero-topline { top: 6px; }
 }
 
 @media (max-width: 600px) {
-  .home-page .hero-art { min-height: 0; }
+  /* Reserve a dedicated strip for the carousel label so it never masks faces. */
+  .home-page .hero-art {
+    min-height: 0;
+    padding-top: 62px;
+  }
+  .home-page .hero-topline { top: 9px; }
   .home-page .hero-slide-media { inset: auto; aspect-ratio: 4 / 3; }
   .home-page .hero-slide-content {
     bottom: auto;
