@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@100..800&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -9,8 +10,8 @@
   --coral: #ef704d;
   --paper: #fffdf7;
   --line: rgba(21, 60, 46, .18);
-  --serif: Georgia, "Times New Roman", serif;
-  --sans: Arial, Helvetica, sans-serif;
+  --serif: "Anek Malayalam", Arial, sans-serif;
+  --sans: "Anek Malayalam", Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
