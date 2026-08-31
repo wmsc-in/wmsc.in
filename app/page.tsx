@@ -1,9 +1,7 @@
 "use client";
 
-import { ArrowDown, ArrowLeft, ArrowRight } from "@phosphor-icons/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight } from "@phosphor-icons/react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type TouchEvent as ReactTouchEvent } from "react";
 
 const ZOHO_FORM_URL = "https://forms.zohopublic.in/rajileshpanolisoa1/form/EventRegistration/formperma/JlTPulLc6fSQ_eCq9wDQWDoPQDlxNiOf2gwviDgy3lU";
 const ZOHO_FORM_ID = "zf_div_JlTPulLc6fSQ_eCq9wDQWDoPQDlxNiOf2gwviDgy3lU";
@@ -106,11 +104,12 @@ export default function Home() {
   const [joinOpen, setJoinOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const [heroPaused, setHeroPaused] = useState(false);
   const zohoContainerRef = useRef<HTMLDivElement>(null);
   const heroCarouselRef = useRef<HTMLDivElement>(null);
-  const heroSlideRefs = useRef<Array<HTMLElement | null>>([]);
-  const heroScrollTriggerRef = useRef<ScrollTrigger | null>(null);
-  const activeHeroSlideRef = useRef(0);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+  const heroPausedRef = useRef(false);
+  const heroResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -128,132 +127,13 @@ export default function Home() {
   }, [joinOpen]);
 
   useEffect(() => {
-    const carousel = heroCarouselRef.current;
-    if (!carousel) return;
-
-    const slides = heroSlideRefs.current.filter((slide): slide is HTMLElement => Boolean(slide));
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!slides.length || reducedMotion) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    const context = gsap.context(() => {
-      const media = slides.map((slide) => slide.querySelector<HTMLElement>(".hero-slide-media"));
-      const captions = slides.map((slide) => slide.querySelector<HTMLElement>(".hero-slide-content"));
-
-      gsap.set(slides, {
-        autoAlpha: 0,
-        xPercent: 0,
-        z: -220,
-        scale: 0.88,
-        rotationY: 13,
-        transformOrigin: "center center",
-        transformPerspective: 1600,
-      });
-      gsap.set(media, { scale: 1.12, rotationX: 0, rotationY: 0, transformPerspective: 1400 });
-      gsap.set(captions, { autoAlpha: 0, y: 64, rotationX: -10, z: 80, transformPerspective: 1200 });
-      gsap.set(slides[0], { autoAlpha: 1, xPercent: 0, z: 0, scale: 1, rotationY: 0 });
-      gsap.set(captions[0], { autoAlpha: 1, y: 0, rotationX: 0, z: 80 });
-
-      const timeline = gsap.timeline({ defaults: { ease: "power3.inOut" } });
-
-      for (let index = 1; index < slides.length; index += 1) {
-        const outgoing = slides[index - 1];
-        const incoming = slides[index];
-        const outgoingCaption = captions[index - 1];
-        const incomingMedia = media[index];
-        const incomingCaption = captions[index];
-        const position = index - 1;
-
-        if (outgoingCaption) {
-          timeline.to(outgoingCaption, {
-            autoAlpha: 0,
-            y: -36,
-            rotationX: 8,
-            duration: 0.55,
-            ease: "power2.in",
-          }, position);
-        }
-
-        timeline
-          .to(outgoing, {
-            autoAlpha: 0,
-            xPercent: -22,
-            z: -260,
-            scale: 0.84,
-            rotationY: -12,
-            duration: 1,
-          }, position)
-          .fromTo(incoming, {
-            autoAlpha: 0,
-            xPercent: 26,
-            z: -280,
-            scale: 0.84,
-            rotationY: 14,
-          }, {
-            autoAlpha: 1,
-            xPercent: 0,
-            z: 0,
-            scale: 1,
-            rotationY: 0,
-            duration: 1,
-          }, position)
-          .fromTo(incomingMedia, {
-            scale: 1.22,
-          }, {
-            scale: 1.05,
-            duration: 1.15,
-            ease: "power2.out",
-          }, position)
-          .fromTo(incomingCaption, {
-            autoAlpha: 0,
-            y: 64,
-            rotationX: -10,
-            z: 45,
-          }, {
-            autoAlpha: 1,
-            y: 0,
-            rotationX: 0,
-            z: 80,
-            duration: 0.72,
-            ease: "power3.out",
-          }, position + 0.22);
-      }
-
-      heroScrollTriggerRef.current = ScrollTrigger.create({
-        animation: timeline,
-        trigger: carousel,
-        start: "top top",
-        end: () => `+=${window.innerHeight * (slides.length - 1)}`,
-        pin: true,
-        scrub: 0.8,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        snap: {
-          snapTo: 1 / (slides.length - 1),
-          directional: false,
-          inertia: false,
-          duration: { min: 0.3, max: 0.75 },
-          delay: 0.6,
-          ease: "power2.inOut",
-        },
-        onUpdate: (self) => {
-          const nextIndex = Math.min(slides.length - 1, Math.round(self.progress * (slides.length - 1)));
-          if (activeHeroSlideRef.current !== nextIndex) {
-            activeHeroSlideRef.current = nextIndex;
-            setActiveHeroSlide(nextIndex);
-          }
-        },
-      });
-    }, carousel);
-
-    ScrollTrigger.refresh();
-    return () => {
-      heroScrollTriggerRef.current?.kill();
-      heroScrollTriggerRef.current = null;
-      context.revert();
-    };
-  }, []);
+    if (heroPaused || menuOpen || joinOpen) return;
+    const autoplay = window.setInterval(() => {
+      if (heroPausedRef.current) return;
+      setActiveHeroSlide((current) => (current + 1) % heroSlides.length);
+    }, 4800);
+    return () => window.clearInterval(autoplay);
+  }, [heroPaused, joinOpen, menuOpen]);
 
   useEffect(() => {
     if (!joinOpen || formSubmitted || !zohoContainerRef.current) return;
@@ -380,48 +260,75 @@ export default function Home() {
 
   const goToHeroSlide = (requestedIndex: number) => {
     const index = Math.max(0, Math.min(heroSlides.length - 1, requestedIndex));
-    const scrollTrigger = heroScrollTriggerRef.current;
-    activeHeroSlideRef.current = index;
     setActiveHeroSlide(index);
-
-    if (scrollTrigger) {
-      const destination = scrollTrigger.start + window.innerHeight * index;
-      scrollTrigger.scroll(destination);
-      ScrollTrigger.update();
-      return;
-    }
-
   };
 
-  const tiltActiveHeroSlide = (clientX: number, clientY: number) => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const carousel = heroCarouselRef.current;
-    const slide = heroSlideRefs.current[activeHeroSlideRef.current];
-    const media = slide?.querySelector<HTMLElement>(".hero-slide-media");
-    if (!carousel || !media) return;
-
-    const bounds = carousel.getBoundingClientRect();
-    const horizontal = (clientX - bounds.left) / bounds.width - 0.5;
-    const vertical = (clientY - bounds.top) / bounds.height - 0.5;
-    gsap.to(media, {
-      x: horizontal * 14,
-      y: vertical * 10,
-      rotationY: horizontal * 5,
-      rotationX: vertical * -4,
-      duration: 0.75,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
+  const pauseHeroTemporarily = () => {
+    heroPausedRef.current = true;
+    setHeroPaused(true);
+    if (heroResumeTimerRef.current) window.clearTimeout(heroResumeTimerRef.current);
+    heroResumeTimerRef.current = window.setTimeout(() => {
+      heroPausedRef.current = false;
+      setHeroPaused(false);
+      heroResumeTimerRef.current = null;
+    }, 6500);
   };
 
-  const resetActiveHeroTilt = () => {
-    const slide = heroSlideRefs.current[activeHeroSlideRef.current];
-    const media = slide?.querySelector<HTMLElement>(".hero-slide-media");
-    if (media) gsap.to(media, { x: 0, y: 0, rotationX: 0, rotationY: 0, duration: 0.85, ease: "power3.out" });
+  const beginHeroSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch" || (event.target as HTMLElement).closest("button, a")) return;
+    pauseHeroTemporarily();
+    swipeStartRef.current = { x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const updateHeroSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
+    const start = swipeStartRef.current;
+    if (!start) return;
+    const horizontalDistance = event.clientX - start.x;
+    const verticalDistance = event.clientY - start.y;
+    if (Math.abs(horizontalDistance) < 44 || Math.abs(horizontalDistance) <= Math.abs(verticalDistance) * 1.1) return;
+
+    swipeStartRef.current = null;
+    goToHeroSlide(activeHeroSlide + (horizontalDistance < 0 ? 1 : -1));
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
+  const finishHeroSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start) return;
+
+    const horizontalDistance = event.clientX - start.x;
+    const verticalDistance = event.clientY - start.y;
+    if (Math.abs(horizontalDistance) < 48 || Math.abs(horizontalDistance) <= Math.abs(verticalDistance)) return;
+    goToHeroSlide(activeHeroSlide + (horizontalDistance < 0 ? 1 : -1));
+  };
+
+  const beginHeroTouch = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest("button, a")) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+    pauseHeroTemporarily();
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const updateHeroTouch = (event: ReactTouchEvent<HTMLDivElement>) => {
+    const start = swipeStartRef.current;
+    const touch = event.touches[0];
+    if (!start || !touch) return;
+    const horizontalDistance = touch.clientX - start.x;
+    const verticalDistance = touch.clientY - start.y;
+    if (Math.abs(horizontalDistance) < 36 || Math.abs(horizontalDistance) <= Math.abs(verticalDistance) * 1.05) return;
+
+    event.preventDefault();
+    swipeStartRef.current = null;
+    goToHeroSlide(activeHeroSlide + (horizontalDistance < 0 ? 1 : -1));
   };
 
   return (
-    <main id="top">
+    <main id="top" className="home-page">
       <div className="announcement">
         <span>നമസ്കാരം</span>
         <p>Malayalis of Whitefield, this is your community.</p>
@@ -451,6 +358,14 @@ export default function Home() {
         ><span /><span /></button>
       </nav>
 
+      <aside className="onam-launch-banner" aria-label="Onam 1.0 featured celebration">
+        <div className="onam-launch-copy">
+          <span className="onam-launch-badge">Featured</span>
+          <p><strong>Onam 1.0</strong><span>Kerala’s grand celebration is coming to Whitefield.</span></p>
+        </div>
+        <a href="/onam/">Explore Onam details <ArrowRight size={18} weight="bold" /></a>
+      </aside>
+
       <section className="hero" id="motion" aria-label="Kerala culture in motion">
         <div
           className="hero-art hero-carousel"
@@ -458,22 +373,35 @@ export default function Home() {
           role="region"
           aria-roledescription="carousel"
           aria-label="Kerala culture highlights"
-          onPointerMove={(event) => tiltActiveHeroSlide(event.clientX, event.clientY)}
-          onPointerLeave={resetActiveHeroTilt}
+          onPointerDown={beginHeroSwipe}
+          onPointerMove={updateHeroSwipe}
+          onPointerUp={finishHeroSwipe}
+          onPointerLeave={(event) => {
+            if (swipeStartRef.current) finishHeroSwipe(event);
+          }}
+          onPointerCancel={() => { swipeStartRef.current = null; }}
+          onTouchStart={beginHeroTouch}
+          onTouchMove={updateHeroTouch}
+          onTouchEnd={() => { swipeStartRef.current = null; }}
+          onTouchCancel={() => { swipeStartRef.current = null; }}
         >
           <div className="hero-slides" aria-live="off">
             {heroSlides.map((slide, index) => (
               <figure
                 className={`hero-slide ${index === activeHeroSlide ? "is-active" : ""}`}
                 key={slide.image}
-                ref={(element) => { heroSlideRefs.current[index] = element; }}
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`${index + 1} of ${heroSlides.length}: ${slide.label}`}
                 aria-hidden={index !== activeHeroSlide}
               >
                 <div className="hero-slide-media">
-                  <img src={slide.image} alt={index === activeHeroSlide ? slide.alt : ""} style={{ objectPosition: slide.position }} />
+                  <img
+                    src={slide.image}
+                    alt={index === activeHeroSlide ? slide.alt : ""}
+                    style={{ objectPosition: slide.position }}
+                    draggable={false}
+                  />
                 </div>
                 <figcaption className="hero-slide-content">
                   <span>{slide.label}</span>
@@ -492,10 +420,10 @@ export default function Home() {
               {String(heroSlides.length).padStart(2, "0")}
             </p>
           </div>
-          <div className="hero-carousel-controls">
+          <div className="hero-carousel-controls" onPointerDown={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()}>
             <button
               className="hero-arrow"
-              onClick={() => goToHeroSlide(activeHeroSlide - 1)}
+              onClick={() => { pauseHeroTemporarily(); goToHeroSlide(activeHeroSlide - 1); }}
               disabled={activeHeroSlide === 0}
               aria-label="Show previous carousel image"
             ><ArrowLeft size={20} weight="bold" /></button>
@@ -504,7 +432,7 @@ export default function Home() {
                 <button
                   className={index === activeHeroSlide ? "is-active" : ""}
                   key={slide.image}
-                  onClick={() => goToHeroSlide(index)}
+                  onClick={() => { pauseHeroTemporarily(); goToHeroSlide(index); }}
                   aria-label={`Show ${slide.label}`}
                   aria-current={index === activeHeroSlide ? "true" : undefined}
                 ><span /></button>
@@ -512,12 +440,11 @@ export default function Home() {
             </div>
             <button
               className="hero-arrow"
-              onClick={() => goToHeroSlide(activeHeroSlide + 1)}
+              onClick={() => { pauseHeroTemporarily(); goToHeroSlide(activeHeroSlide + 1); }}
               disabled={activeHeroSlide === heroSlides.length - 1}
               aria-label="Show next carousel image"
             ><ArrowRight size={20} weight="bold" /></button>
           </div>
-          <p className="hero-scroll-hint">Scroll to travel <ArrowDown size={16} weight="bold" /></p>
         </div>
       </section>
 
