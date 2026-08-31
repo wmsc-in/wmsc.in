@@ -483,7 +483,7 @@ footer { padding: 75px max(32px, calc((100vw - 1320px) / 2)) 25px; color: var(--
   color: #fff;
   background: rgba(41,7,2,.3);
   box-shadow: 4px 4px 4px rgba(0,0,0,.08), inset 0 1px 1px rgba(255,255,255,.18), 0 28px 90px rgba(0,0,0,.23);
-  backdrop-filter: blur(34px);
+  backdrop-filter: blur(34px) opacity(0.1);
 }
 .home-page .hero-slide-content > span { color: var(--lime); }
 .home-page .hero-slide-content p { color: #ffe8ad; font-style: italic; }
