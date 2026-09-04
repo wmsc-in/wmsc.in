@@ -346,6 +346,7 @@ export default function Home() {
           <a href="#community" onClick={() => setMenuOpen(false)}>Community</a>
           <a href="#moments" onClick={() => setMenuOpen(false)}>What we do</a>
           <a href="/onam/" onClick={() => setMenuOpen(false)}>Onam 1.0</a>
+          <a href="/blog/" onClick={() => setMenuOpen(false)}>News</a>
           <a href="#faq" onClick={() => setMenuOpen(false)}>Questions</a>
           <a className="nav-cta" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join WMSC <span aria-hidden="true">↗</span></a>
         </div>
@@ -561,7 +562,7 @@ export default function Home() {
         <div className="footer-main">
           <div className="footer-brand"><img src="/logo.png" alt="WMSC emblem" /><div><strong>WMSC</strong><p>Whitefield Malayali<br />Social Club</p></div></div>
           <p>Kerala in our hearts.<br />Whitefield at our doorstep.</p>
-          <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><a href="/onam/">Onam 1.0</a><a className="footer-join" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join us</a></div>
+          <div className="footer-links"><a href="#about">Our story</a><a href="#community">Community</a><a href="#moments">What we do</a><a href="/onam/">Onam 1.0</a><a href="/blog/">News</a><a className="footer-join" href={JOIN_FORM_URL} target="_blank" rel="noreferrer">Join us</a></div>
           <div className="footer-social">
             <p>Follow the community</p>
             <div>
