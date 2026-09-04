@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import BlogNavigation from "./blog-navigation";
 import styles from "./blog.module.css";
 
 const sourceUrl = "https://bangalorejalakam.com/the-whitefield-malayali-social-club-organized-an-executive-committee-meeting/";
@@ -23,25 +24,7 @@ export default function BlogPage() {
         <time dateTime="2026-09-04">04 September 2026</time>
       </div>
 
-      <header className={styles.header}>
-        <nav className={styles.nav} aria-label="Primary navigation">
-          <a className={styles.brand} href="/" aria-label="WMSC home">
-            <img src="/logo.png" alt="" />
-            <span>
-              <strong>WMSC</strong>
-              <small>Whitefield Malayali Social Club</small>
-            </span>
-          </a>
-
-          <div className={styles.navLinks}>
-            <a href="/">Home</a>
-            <a href="/onam/">Onam 1.0</a>
-            <a className={styles.joinLink} href={joinUrl} target="_blank" rel="noreferrer">
-              Join WMSC <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-        </nav>
-      </header>
+      <BlogNavigation />
 
       <article className={styles.article}>
         <div className={styles.hero}>

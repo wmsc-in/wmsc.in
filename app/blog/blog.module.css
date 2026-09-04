@@ -51,9 +51,10 @@
 .brand strong { color: #fff; font-size: 1.08rem; font-weight: 900; letter-spacing: .13em; }
 .brand small { color: rgba(255, 255, 255, .66); font-size: .72rem; }
 
-.navLinks { display: flex; align-items: center; gap: 26px; font-size: .86rem; font-weight: 700; }
+.navLinks { display: flex; align-items: center; gap: 18px; font-size: .78rem; font-weight: 700; }
 .navLinks > a:not(.joinLink) { color: rgba(255, 255, 255, .78); transition: color .2s ease; }
 .navLinks > a:not(.joinLink):hover { color: #ffe4a0; }
+.navLinks > a[aria-current="page"] { color: #ffe4a0; }
 .joinLink {
   padding: 13px 18px;
   border-radius: 999px;
@@ -63,6 +64,7 @@
 }
 .joinLink span { margin-left: 8px; }
 .joinLink:hover { background: #ffd36a; transform: translateY(-1px); }
+.menuToggle { display: none; }
 
 .article { background: var(--blog-paper); }
 .hero {
@@ -256,7 +258,42 @@
   .nav { width: calc(100% - 32px); min-height: 88px; }
   .brand img { width: 52px; height: 54px; }
   .brand small { display: none; }
-  .navLinks > a:not(.joinLink) { display: none; }
+  .menuToggle {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid rgba(255, 236, 190, .35);
+    border-radius: 50%;
+    display: block;
+    background: rgba(40, 6, 1, .28);
+    position: relative;
+    z-index: 3;
+  }
+  .menuToggle span { width: 17px; height: 1px; position: absolute; left: 12px; top: 17px; background: #fff; transition: .25s ease; }
+  .menuToggle span:last-child { top: 23px; }
+  .menuToggleOpen span:first-child { top: 20px; transform: rotate(45deg); }
+  .menuToggleOpen span:last-child { top: 20px; transform: rotate(-45deg); }
+  .navLinks {
+    width: 100%;
+    height: 0;
+    padding: 0 28px;
+    position: absolute;
+    z-index: 2;
+    top: 126px;
+    left: 0;
+    overflow: hidden;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 27px;
+    color: var(--blog-paper);
+    background: linear-gradient(150deg, rgba(20, 3, 0, .98), rgba(102, 24, 5, .98));
+    font-size: 2rem;
+    font-weight: 500;
+    transition: height .4s cubic-bezier(.22, .8, .28, 1), padding .4s ease;
+  }
+  .navLinks.menuOpen { height: calc(100svh - 126px); padding-top: 58px; padding-bottom: 48px; }
+  .navLinks > a:not(.joinLink) { color: var(--blog-paper); }
   .joinLink { padding: 12px 15px; font-size: .76rem; }
   .hero { min-height: auto; padding: 62px 20px 108px; }
   .backLink { margin-bottom: 48px; }
