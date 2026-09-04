@@ -31,7 +31,7 @@ export default function BlogPage() {
             <a className={styles.backLink} href="/">
               <span aria-hidden="true">←</span> Back to WMSC
             </a>
-            <p className={styles.kicker}><span /> Association News</p>
+            <p className={styles.kicker}><span /> News</p>
             <h1 lang="ml">{title}</h1>
             <div className={styles.meta}>
               <p><span>Published</span><time dateTime="2026-09-04">04 September 2026</time></p>
