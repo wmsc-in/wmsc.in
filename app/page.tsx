@@ -336,7 +336,7 @@ export default function Home() {
       </div>
 
       <nav className="site-nav" aria-label="Primary navigation">
-        <a className="brand" href="#top" aria-label="WMSC home">
+        <a className="brand" href="/" aria-label="WMSC home">
           <img src="/logo.png" alt="" />
           <span><strong>WMSC</strong><small>Whitefield Malayali Social Club</small></span>
         </a>

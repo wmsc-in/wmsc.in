@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import BlogNavigation from "./blog-navigation";
 import styles from "./blog.module.css";
 
-const sourceUrl = "https://bangalorejalakam.com/the-whitefield-malayali-social-club-organized-an-executive-committee-meeting/";
 const joinUrl = "https://forms.gle/ajbEX18S3ryEoFgC8?utm_source=wmsc.in";
 
 const title = "വൈറ്റ്ഫീൽഡ് മലയാളി സോഷ്യൽ ക്ലബ് പ്രവർത്തക സമിതി യോഗം സംഘടിപ്പിച്ചു";
@@ -69,13 +68,6 @@ export default function BlogPage() {
 
             <p>അംഗങ്ങളുടെയും കുടുംബങ്ങളുടെയും സജീവ പങ്കാളിത്തം യോഗത്തിന് കൂടുതൽ ആവേശവും കൂട്ടായ്മയും പകർന്നു. ഓണത്തിൻ്റെ സ്നേഹവും സൗഹൃദവും മലയാളി കൂട്ടായ്മയുടെ ഐക്യവും ഉയർത്തിപ്പിടിക്കുന്ന മികച്ചൊരു ആഘോഷത്തിനായുള്ള ഒരുക്കങ്ങൾക്ക് യോഗം തുടക്കം കുറിച്ചു.</p>
 
-            <div className={styles.sourceNote}>
-              <span>Source</span>
-              <p>
-                Originally published by Bangalore Jalakam.{' '}
-                <a href={sourceUrl} target="_blank" rel="noreferrer">Read the original article <span aria-hidden="true">↗</span></a>
-              </p>
-            </div>
           </div>
         </div>
       </article>
