@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+import Link from "next/link";
+import StructuredData from "../structured-data";
+import { pageMetadata, pageSchema, breadcrumbSchema, organizationId, siteUrl } from "../../lib/seo";
 import BlogNavigation from "./blog-navigation";
 import styles from "./blog.module.css";
 
@@ -9,14 +11,20 @@ const description = "വൈറ്റ്ഫീൽഡ് മലയാളി സോ
 
 export const dynamic = "force-static";
 
-export const metadata: Metadata = {
-  title: `${title} — WMSC`,
-  description,
-};
+export const metadata = pageMetadata({ title: `${title} — WMSC`, description, path: "/blog/", image: "/wmsc-executive-committee-meeting.jpg", imageAlt: "WMSC executive committee meeting", locale: "ml_IN", article: true });
 
 export default function BlogPage() {
   return (
     <main id="top" className={styles.page}>
+      <StructuredData data={[
+        { ...pageSchema("/blog/", title, description, "ml-IN"), mainEntity: { "@id": `${siteUrl}/blog/#article` } },
+        breadcrumbSchema("/blog/", "WMSC News"),
+        { "@type": "NewsArticle", "@id": `${siteUrl}/blog/#article`, headline: title, description,
+          url: `${siteUrl}/blog/`, mainEntityOfPage: { "@id": `${siteUrl}/blog/#webpage` },
+          image: [`${siteUrl}/wmsc-executive-committee-meeting.jpg`], datePublished: "2026-09-04",
+          author: { "@id": organizationId }, publisher: { "@id": organizationId },
+          inLanguage: "ml-IN", articleSection: "Community news", about: { "@id": organizationId } },
+      ]} />
       <div className={styles.announcement}>
         <span>WMSC വാർത്തകൾ</span>
         <p>Community news from Whitefield</p>
@@ -28,9 +36,9 @@ export default function BlogPage() {
       <article className={styles.article}>
         <div className={styles.hero}>
           <div className={styles.heroIntro}>
-            <a className={styles.backLink} href="/">
+            <Link className={styles.backLink} href="/">
               <span aria-hidden="true">←</span> Back to WMSC
-            </a>
+            </Link>
             <p className={styles.kicker}><span /> News</p>
             <h1 lang="ml">{title}</h1>
             <div className={styles.meta}>
@@ -87,7 +95,7 @@ export default function BlogPage() {
         </div>
         <p>Kerala in our hearts.<br />Whitefield at our doorstep.</p>
         <div className={styles.footerLinks}>
-          <a href="/">Home</a>
+          <Link href="/">Home</Link>
           <a href="/onam/">Onam 1.0</a>
           <a href="#top">Back to top ↑</a>
         </div>

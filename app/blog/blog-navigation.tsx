@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import styles from "./blog.module.css";
 
@@ -20,13 +21,13 @@ export default function BlogNavigation() {
   return (
     <header className={styles.header}>
       <nav className={styles.nav} aria-label="Primary navigation">
-        <a className={styles.brand} href="/" aria-label="WMSC home">
+        <Link className={styles.brand} href="/" aria-label="WMSC home">
           <img src="/logo.png" alt="" />
           <span>
             <strong>WMSC</strong>
             <small>Whitefield Malayali Social Club</small>
           </span>
-        </a>
+        </Link>
 
         <div className={`${styles.navLinks} ${menuOpen ? styles.menuOpen : ""}`}>
           {navigation.map((item) => (
