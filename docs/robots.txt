@@ -1,0 +1,5 @@
+# Public pages and assets are available to search and AI crawlers.
+User-agent: *
+Allow: /
+
+Sitemap: https://wmsc.in/sitemap.xml

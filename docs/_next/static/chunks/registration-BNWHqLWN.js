@@ -1,0 +1,1 @@
+var e=`https://forms.gle/17sSxGmyE9S6xavH7`;export{e as t};
